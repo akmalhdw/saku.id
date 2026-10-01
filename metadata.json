@@ -1,0 +1,6 @@
+{
+  "name": "KelolaUang - Smart Budget & Expense Planner",
+  "description": "Aplikasi manajemen keuangan pribadi lengkap dengan perencanaan anggaran harian, mingguan, dan bulanan, sistem peringatan limit overbudget, serta analisis keuangan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
