@@ -387,6 +387,7 @@ export default function App() {
           <DashboardView
             wallets={wallets}
             transactions={transactions}
+            debts={debts}
             analysis={analysis}
             budgetConfig={budgetConfig}
             onOpenAddModal={() => {
@@ -434,6 +435,7 @@ export default function App() {
           <WalletsView
             wallets={wallets}
             transactions={transactions}
+            debts={debts}
             onOpenTransferModal={() => setIsTransferModalOpen(true)}
             onUpdateWallets={setWallets}
           />

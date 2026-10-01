@@ -12,9 +12,10 @@ import {
   Utensils, 
   Fuel, 
   ShoppingBag,
-  ArrowRight
+  ArrowRight,
+  CreditCard
 } from 'lucide-react';
-import { Transaction, Wallet, BudgetConfig } from '../types/finance';
+import { Transaction, Wallet, BudgetConfig, DebtItem } from '../types/finance';
 import { BudgetAnalysisResult } from '../utils/budgetEngine';
 import { formatRupiah, formatDateIndo } from '../utils/formatters';
 import { BudgetProgressCard } from './BudgetProgressCard';
@@ -22,6 +23,7 @@ import { BudgetProgressCard } from './BudgetProgressCard';
 interface DashboardViewProps {
   wallets: Wallet[];
   transactions: Transaction[];
+  debts: DebtItem[];
   analysis: BudgetAnalysisResult;
   budgetConfig: BudgetConfig;
   onOpenAddModal: () => void;
@@ -36,6 +38,7 @@ interface DashboardViewProps {
 export const DashboardView: React.FC<DashboardViewProps> = ({
   wallets,
   transactions,
+  debts,
   analysis,
   budgetConfig,
   onOpenAddModal,
@@ -47,6 +50,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onQuickAdd,
 }) => {
   const totalBalance = wallets.reduce((acc, w) => acc + w.balance, 0);
+
+  const totalActiveDebt = (debts || [])
+    .filter((d) => d.type === 'debt' && d.status === 'active')
+    .reduce((acc, d) => acc + (d.amount - d.paidAmount), 0);
+
+  const activeDebtCount = (debts || []).filter((d) => d.type === 'debt' && d.status === 'active').length;
+
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(`${b.date}T${b.time || '00:00'}`).getTime() - new Date(`${a.date}T${a.time || '00:00'}`).getTime())
     .slice(0, 6);
@@ -62,26 +72,50 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* 4 High-Density Key Financial Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 5 High-Density Key Financial Metrics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Total Saldo */}
         <div className="p-5 bg-white rounded-xl border border-neutral-200 shadow-xs">
           <div className="flex items-center justify-between text-neutral-500 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider">Total Kekayaan Cair</span>
+            <span className="text-xs font-semibold uppercase tracking-wider">Total Saldo Kas</span>
             <div className="p-2 bg-neutral-100 rounded-lg text-neutral-700">
               <WalletIcon className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-mono tracking-tight text-neutral-900 tabular-nums">
+          <div className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900 tabular-nums">
             {formatRupiah(totalBalance)}
           </div>
           <div className="mt-2 text-xs text-neutral-500 flex items-center justify-between">
-            <span>{wallets.length} Akun / Dompet</span>
+            <span>{wallets.length} Dompet/Akun</span>
             <button
               onClick={() => onSelectTab('wallets')}
               className="text-neutral-700 hover:text-neutral-950 font-medium hover:underline text-[11px]"
             >
-              Lihat Rincian →
+              Rincian →
+            </button>
+          </div>
+        </div>
+
+        {/* Total Hutang */}
+        <div className="p-5 bg-white rounded-xl border border-neutral-200 shadow-xs">
+          <div className="flex items-center justify-between text-neutral-500 mb-2">
+            <span className="text-xs font-semibold uppercase tracking-wider">Total Hutang</span>
+            <div className={`p-2 rounded-lg ${totalActiveDebt > 0 ? 'bg-red-50 text-red-600' : 'bg-neutral-100 text-neutral-700'}`}>
+              <CreditCard className="w-4 h-4" />
+            </div>
+          </div>
+          <div className={`text-xl sm:text-2xl font-bold font-mono tracking-tight tabular-nums ${
+            totalActiveDebt > 0 ? 'text-red-600' : 'text-neutral-900'
+          }`}>
+            {formatRupiah(totalActiveDebt)}
+          </div>
+          <div className="mt-2 text-xs text-neutral-500 flex items-center justify-between">
+            <span>{activeDebtCount > 0 ? `${activeDebtCount} Tagihan Belum Lunas` : 'Bebas Hutang'}</span>
+            <button
+              onClick={() => onSelectTab('bills')}
+              className="text-neutral-700 hover:text-neutral-950 font-medium hover:underline text-[11px]"
+            >
+              Kelola →
             </button>
           </div>
         </div>
@@ -94,11 +128,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-mono tracking-tight text-emerald-600 tabular-nums">
+          <div className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-emerald-600 tabular-nums">
             +{formatRupiah(analysis.totalIncomeThisMonth)}
           </div>
           <div className="mt-2 text-xs text-neutral-500">
-            Arus kas masuk terverifikasi
+            Arus kas masuk
           </div>
         </div>
 
@@ -110,11 +144,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <TrendingDown className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-mono tracking-tight text-neutral-900 tabular-nums">
+          <div className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900 tabular-nums">
             {formatRupiah(analysis.totalExpenseThisMonth)}
           </div>
           <div className="mt-2 text-xs text-neutral-500 font-mono">
-            {analysis.monthly.percentage}% dari kuota {formatRupiah(budgetConfig.monthlyLimit)}
+            {analysis.monthly.percentage}% kuota bulanan
           </div>
         </div>
 
@@ -126,13 +160,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <Scale className="w-4 h-4" />
             </div>
           </div>
-          <div className={`text-2xl font-bold font-mono tracking-tight tabular-nums ${
+          <div className={`text-xl sm:text-2xl font-bold font-mono tracking-tight tabular-nums ${
             analysis.netCashFlowThisMonth >= 0 ? 'text-neutral-900' : 'text-red-600'
           }`}>
             {analysis.netCashFlowThisMonth >= 0 ? '+' : ''}{formatRupiah(analysis.netCashFlowThisMonth)}
           </div>
           <div className="mt-2 text-xs text-neutral-500 font-mono">
-            Tingkat Tabungan: <strong className="text-neutral-800">{analysis.savingsRate}%</strong>
+            Tabungan: <strong className="text-neutral-800">{analysis.savingsRate}%</strong>
           </div>
         </div>
       </div>

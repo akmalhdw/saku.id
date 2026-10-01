@@ -11,12 +11,13 @@ import {
   Trash2,
   Check
 } from 'lucide-react';
-import { Wallet, WalletType, Transaction } from '../types/finance';
+import { Wallet, WalletType, Transaction, DebtItem } from '../types/finance';
 import { formatRupiah, formatNumber, parseRupiahInput } from '../utils/formatters';
 
 interface WalletsViewProps {
   wallets: Wallet[];
   transactions: Transaction[];
+  debts?: DebtItem[];
   onOpenTransferModal: () => void;
   onUpdateWallets: (wallets: Wallet[]) => void;
 }
@@ -24,6 +25,7 @@ interface WalletsViewProps {
 export const WalletsView: React.FC<WalletsViewProps> = ({
   wallets,
   transactions,
+  debts = [],
   onOpenTransferModal,
   onUpdateWallets,
 }) => {
@@ -38,6 +40,10 @@ export const WalletsView: React.FC<WalletsViewProps> = ({
   const [walletColor, setWalletColor] = useState('#2563eb');
 
   const totalBalance = wallets.reduce((acc, w) => acc + w.balance, 0);
+  const totalDebt = (debts || [])
+    .filter((d) => d.type === 'debt' && d.status === 'active')
+    .reduce((acc, d) => acc + (d.amount - d.paidAmount), 0);
+  const netWorth = totalBalance - totalDebt;
 
   const getWalletIcon = (type: WalletType) => {
     switch (type) {
@@ -152,16 +158,31 @@ export const WalletsView: React.FC<WalletsViewProps> = ({
         </div>
       </div>
 
-      {/* Total Balance Card */}
-      <div className="p-6 bg-neutral-900 text-white rounded-xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Total Balance & Net Worth Overview */}
+      <div className="p-6 bg-neutral-900 text-white rounded-xl shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div>
-          <span className="text-xs font-medium text-neutral-400">Total Akumulasi Saldo Bersih</span>
-          <div className="text-3xl font-bold font-mono tracking-tight text-white mt-1 tabular-nums">
+          <span className="text-xs font-medium text-neutral-400">Total Saldo Kas ({wallets.length} Akun)</span>
+          <div className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-white mt-1 tabular-nums">
             {formatRupiah(totalBalance)}
           </div>
         </div>
-        <div className="text-xs text-neutral-400 font-mono">
-          Tersebar di {wallets.length} Akun Penyimpanan
+
+        <div>
+          <span className="text-xs font-medium text-neutral-400">Total Hutang Aktif</span>
+          <div className={`text-2xl sm:text-3xl font-bold font-mono tracking-tight mt-1 tabular-nums ${
+            totalDebt > 0 ? 'text-red-400' : 'text-neutral-300'
+          }`}>
+            {formatRupiah(totalDebt)}
+          </div>
+        </div>
+
+        <div>
+          <span className="text-xs font-medium text-neutral-400">Kekayaan Bersih (Saldo - Hutang)</span>
+          <div className={`text-2xl sm:text-3xl font-bold font-mono tracking-tight mt-1 tabular-nums ${
+            netWorth >= 0 ? 'text-emerald-400' : 'text-red-400'
+          }`}>
+            {formatRupiah(netWorth)}
+          </div>
         </div>
       </div>
 

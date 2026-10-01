@@ -132,7 +132,7 @@ export const BillsAndDebtsView: React.FC<BillsAndDebtsViewProps> = ({
         <div>
           <h2 className="text-base font-bold text-neutral-900">Tagihan Rutin & Hutang Piutang</h2>
           <p className="text-xs text-neutral-500">
-            Pastikan tagihan bulanan tidak terlewat dan catat pinjaman agar keuangan tetap rapi dan berkah.
+            Pastikan tagihan bulanan tidak terlewat dan pantau catatan hutang/piutang secara transparan.
           </p>
         </div>
 
@@ -154,6 +154,42 @@ export const BillsAndDebtsView: React.FC<BillsAndDebtsViewProps> = ({
           >
             Hutang & Piutang ({debts.length})
           </button>
+        </div>
+      </div>
+
+      {/* Unified Obligation Metrics Banner */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-4 bg-white rounded-xl border border-neutral-200 shadow-xs">
+          <div className="flex items-center justify-between text-neutral-500 mb-1">
+            <span className="text-xs font-semibold uppercase">Total Hutang (Kewajiban Anda)</span>
+            <span className="w-2 h-2 rounded-full bg-red-500" />
+          </div>
+          <div className="text-2xl font-bold font-mono text-red-600 tabular-nums">
+            {formatRupiah(totalDebts)}
+          </div>
+          <p className="text-[11px] text-neutral-500 mt-0.5">Uang yang wajib Anda kembalikan</p>
+        </div>
+
+        <div className="p-4 bg-white rounded-xl border border-neutral-200 shadow-xs">
+          <div className="flex items-center justify-between text-neutral-500 mb-1">
+            <span className="text-xs font-semibold uppercase">Total Piutang (Hak Anda)</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          </div>
+          <div className="text-2xl font-bold font-mono text-neutral-900 tabular-nums">
+            {formatRupiah(totalReceivables)}
+          </div>
+          <p className="text-[11px] text-neutral-500 mt-0.5">Uang Anda di orang lain yang belum ditagih</p>
+        </div>
+
+        <div className="p-4 bg-white rounded-xl border border-neutral-200 shadow-xs">
+          <div className="flex items-center justify-between text-neutral-500 mb-1">
+            <span className="text-xs font-semibold uppercase">Tagihan Rutin Belum Bayar</span>
+            <span className="w-2 h-2 rounded-full bg-amber-500" />
+          </div>
+          <div className="text-2xl font-bold font-mono text-amber-700 tabular-nums">
+            {formatRupiah(unpaidBillsAmount)}
+          </div>
+          <p className="text-[11px] text-neutral-500 mt-0.5">WiFi, Listrik, BPJS bulan ini</p>
         </div>
       </div>
 
