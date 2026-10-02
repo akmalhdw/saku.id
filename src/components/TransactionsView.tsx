@@ -21,6 +21,7 @@ interface TransactionsViewProps {
   onOpenAddModal: () => void;
   onEditTransaction: (tx: Transaction) => void;
   onDeleteTransaction: (id: string) => void;
+  onClearAllTransactions?: () => void;
   initialCategoryFilter?: string;
 }
 
@@ -30,6 +31,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
   onOpenAddModal,
   onEditTransaction,
   onDeleteTransaction,
+  onClearAllTransactions,
   initialCategoryFilter,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -127,25 +129,39 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
   return (
     <div className="space-y-5">
       {/* Top Header & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-neutral-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white rounded-2xl border border-neutral-200/70 shadow-xs">
         <div>
           <h2 className="text-base font-bold text-neutral-900">Buku Kas & Riwayat Transaksi</h2>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-neutral-500 mt-0.5">
             Daftar lengkap pemasukan dan pengeluaran dengan filter fleksibel dan ekspor CSV.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {transactions.length > 0 && onClearAllTransactions && (
+            <button
+              onClick={() => {
+                if (confirm('Hapus semua catatan transaksi? Total pengeluaran dan pemasukan akan menjadi Rp 0.')) {
+                  onClearAllTransactions();
+                }
+              }}
+              title="Kosongkan seluruh riwayat pemasukan dan pengeluaran"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border border-neutral-200 bg-white hover:bg-red-50 text-neutral-600 hover:text-red-700 transition-colors shadow-2xs"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-red-600" />
+              <span>Reset Semua Transaksi</span>
+            </button>
+          )}
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-700 transition-colors shadow-2xs"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 transition-colors shadow-2xs"
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-3.5 h-3.5" />
             <span>Ekspor CSV</span>
           </button>
           <button
             onClick={onOpenAddModal}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-neutral-900 text-white hover:bg-neutral-800 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 transition-colors shadow-2xs"
           >
             <Plus className="w-4 h-4" />
             <span>+ Catat Transaksi</span>

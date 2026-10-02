@@ -464,6 +464,13 @@ export default function App() {
     }
   };
 
+  // Reset only transactions (nolkan pengeluaran & pemasukan)
+  const handleResetTransactionsOnly = () => {
+    setTransactions([]);
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}_transactions`, JSON.stringify([]));
+    setActiveTab('dashboard');
+  };
+
   // Clean Zero Database Reset (No fake data, all balances start at 0)
   const handleResetToCleanZero = () => {
     localStorage.clear();
@@ -586,6 +593,7 @@ export default function App() {
               setIsAddTxModalOpen(true);
             }}
             onDeleteTransaction={handleDeleteTransaction}
+            onClearAllTransactions={handleResetTransactionsOnly}
             initialCategoryFilter={prefilledCategoryFilter}
           />
         )}
@@ -671,6 +679,7 @@ export default function App() {
       <ResetDataModal
         isOpen={isResetModalOpen}
         onClose={() => setIsResetModalOpen(false)}
+        onResetTransactionsOnly={handleResetTransactionsOnly}
         onResetToCleanZero={handleResetToCleanZero}
         onResetToDemoData={handleResetToDemoData}
       />

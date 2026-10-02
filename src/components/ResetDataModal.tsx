@@ -4,6 +4,7 @@ import { X, RotateCcw, Trash2, Sparkles, ShieldAlert } from 'lucide-react';
 interface ResetDataModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onResetTransactionsOnly: () => void;
   onResetToCleanZero: () => void;
   onResetToDemoData: () => void;
 }
@@ -11,6 +12,7 @@ interface ResetDataModalProps {
 export const ResetDataModal: React.FC<ResetDataModalProps> = ({
   isOpen,
   onClose,
+  onResetTransactionsOnly,
   onResetToCleanZero,
   onResetToDemoData,
 }) => {
@@ -32,12 +34,29 @@ export const ResetDataModal: React.FC<ResetDataModalProps> = ({
           </button>
         </div>
 
-        <div className="p-6 space-y-4 text-xs text-neutral-600">
+        <div className="p-6 space-y-3.5 text-xs text-neutral-600">
           <p className="leading-relaxed">
             Semua data tersimpan privat di memori lokal HP Anda. Pilih cara Anda ingin mengatur ulang data:
           </p>
 
-          {/* Option 1: Clean Zero Start */}
+          {/* Option 1: Reset Transactions Only (Nolkan Pengeluaran & Pemasukan) */}
+          <div 
+            onClick={() => {
+              onResetTransactionsOnly();
+              onClose();
+            }}
+            className="p-4 rounded-xl border border-neutral-200 hover:border-neutral-900 hover:bg-neutral-50/60 cursor-pointer transition-all space-y-1 group"
+          >
+            <div className="flex items-center gap-2 text-neutral-900 font-bold text-sm">
+              <RotateCcw className="w-4 h-4 text-red-600 group-hover:text-red-700" />
+              <span>Nolkan Pengeluaran & Pemasukan (Hapus Transaksi)</span>
+            </div>
+            <p className="text-[11px] text-neutral-500 leading-relaxed pl-6">
+              Hapus semua riwayat transaksi sehingga total pengeluaran dan pemasukan bulan ini kembali ke <strong>Rp 0</strong>. Saldo dompet Anda tetap dipertahankan.
+            </p>
+          </div>
+
+          {/* Option 2: Clean Zero Start */}
           <div 
             onClick={() => {
               onResetToCleanZero();
@@ -47,14 +66,14 @@ export const ResetDataModal: React.FC<ResetDataModalProps> = ({
           >
             <div className="flex items-center gap-2 text-neutral-900 font-bold text-sm">
               <Trash2 className="w-4 h-4 text-neutral-700 group-hover:text-neutral-900" />
-              <span>Mulai Baru dari Nol (Saldo Bersih Rp 0)</span>
+              <span>Mulai Baru dari Nol (Reset Total Saldo Rp 0)</span>
             </div>
             <p className="text-[11px] text-neutral-500 leading-relaxed pl-6">
-              Hapus semua data contoh/dummy. Siapkan dompet dengan saldo 0 tanpa transaksi tiruan sehingga Anda bisa mencatat keuangan pribadi Anda yang sebenarnya.
+              Hapus seluruh data dummy (transaksi, tabungan, hutang). Siapkan dompet dengan saldo 0 tanpa data tiruan, siap diisi keuangan pribadi Anda.
             </p>
           </div>
 
-          {/* Option 2: Load Demo Example */}
+          {/* Option 3: Load Demo Example */}
           <div 
             onClick={() => {
               onResetToDemoData();
