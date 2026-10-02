@@ -315,15 +315,15 @@ export const BudgetPlannerView: React.FC<BudgetPlannerViewProps> = ({
       </div>
 
       {/* 50/30/20 Smart Budget Calculator Widget */}
-      <div className="p-5 bg-neutral-900 text-white rounded-xl shadow-sm">
+      <div className="p-5 sm:p-6 bg-white rounded-2xl border border-neutral-200/80 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1 max-w-xl">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <h3 className="text-sm font-bold tracking-tight">Kalkulator Kaidah 50 / 30 / 20</h3>
+              <Sparkles className="w-4 h-4 text-neutral-800" />
+              <h3 className="text-sm font-bold text-neutral-900">Kalkulator Kaidah 50 / 30 / 20</h3>
             </div>
-            <p className="text-xs text-neutral-300 leading-relaxed">
-              Metode standar perencanaan finansial sehat: <strong>50% Kebutuhan Primer</strong> (Makan, Tagihan, Transport), <strong>30% Keinginan / Hiburan</strong>, dan <strong>20% Tabungan / Investasi / Dana Darurat</strong>.
+            <p className="text-xs text-neutral-600 leading-relaxed">
+              Metode perencanaan finansial berimbang: <strong>50% Kebutuhan Pokok</strong>, <strong>30% Gaya Hidup & Hiburan</strong>, dan <strong>20% Tabungan / Investasi</strong>.
             </p>
           </div>
 
@@ -339,12 +339,12 @@ export const BudgetPlannerView: React.FC<BudgetPlannerViewProps> = ({
                   setIncomeForCalc(raw);
                 }}
                 placeholder="Pemasukan Bulanan"
-                className="pl-9 pr-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-xs font-mono font-bold text-white w-44 focus:outline-none focus:ring-1 focus:ring-amber-400 tabular-nums"
+                className="pl-9 pr-3 py-2 rounded-xl bg-neutral-50 border border-neutral-300 text-xs font-mono font-bold text-neutral-900 w-44 focus:outline-none focus:ring-1 focus:ring-neutral-900 tabular-nums"
               />
             </div>
             <button
               onClick={handleApply503020Rule}
-              className="px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold text-xs transition-colors whitespace-nowrap active:scale-95"
+              className="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-xs transition-colors whitespace-nowrap active:scale-95"
             >
               Terapkan Formula
             </button>
@@ -352,24 +352,24 @@ export const BudgetPlannerView: React.FC<BudgetPlannerViewProps> = ({
         </div>
 
         {calcActive && (
-          <div className="mt-4 pt-4 border-t border-neutral-800 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <div className="p-3 rounded-lg bg-neutral-800/80 border border-neutral-700">
-              <div className="text-neutral-400 text-[11px]">Kebutuhan Pokok (50%)</div>
-              <div className="text-base font-bold font-mono text-white mt-0.5">
+          <div className="mt-4 pt-4 border-t border-neutral-100 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/60">
+              <div className="text-neutral-500 text-[11px] font-medium">Kebutuhan Pokok (50%)</div>
+              <div className="text-base font-bold font-mono text-neutral-900 mt-0.5">
                 {formatRupiah(Math.round(parseRupiahInput(incomeForCalc) * 0.5))}
               </div>
               <div className="text-[10px] text-neutral-400 mt-1">Makanan, Sewa/Cicilan, Utilitas, Bensin</div>
             </div>
-            <div className="p-3 rounded-lg bg-neutral-800/80 border border-neutral-700">
-              <div className="text-neutral-400 text-[11px]">Keinginan & Lifestyle (30%)</div>
-              <div className="text-base font-bold font-mono text-white mt-0.5">
+            <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/60">
+              <div className="text-neutral-500 text-[11px] font-medium">Gaya Hidup & Hiburan (30%)</div>
+              <div className="text-base font-bold font-mono text-neutral-900 mt-0.5">
                 {formatRupiah(Math.round(parseRupiahInput(incomeForCalc) * 0.3))}
               </div>
-              <div className="text-[10px] text-neutral-400 mt-1">Nongkrong, Hiburan, Belanja Hobi, Langganan</div>
+              <div className="text-[10px] text-neutral-400 mt-1">Nongkrong, Hiburan, Hobi, Langganan</div>
             </div>
-            <div className="p-3 rounded-lg bg-neutral-800/80 border border-neutral-700">
-              <div className="text-neutral-400 text-[11px]">Tabungan & Investasi (20%)</div>
-              <div className="text-base font-bold font-mono text-emerald-400 mt-0.5">
+            <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/60">
+              <div className="text-neutral-500 text-[11px] font-medium">Tabungan & Investasi (20%)</div>
+              <div className="text-base font-bold font-mono text-emerald-700 mt-0.5">
                 {formatRupiah(Math.round(parseRupiahInput(incomeForCalc) * 0.2))}
               </div>
               <div className="text-[10px] text-neutral-400 mt-1">Dana Darurat, Reksadana, Deposito</div>

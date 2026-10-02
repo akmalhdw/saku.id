@@ -89,29 +89,29 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
       </div>
 
       {/* Aggregate Goal Tracker */}
-      <div className="p-6 bg-neutral-900 text-white rounded-xl shadow-xs space-y-4">
+      <div className="p-5 sm:p-6 bg-white rounded-2xl border border-neutral-200/80 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span className="text-xs text-neutral-400 font-medium">Total Akumulasi Tabungan Impian</span>
-            <div className="text-3xl font-bold font-mono tracking-tight text-white mt-1 tabular-nums">
+            <span className="text-xs text-neutral-500 font-medium">Total Akumulasi Tabungan Impian</span>
+            <div className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-neutral-900 mt-1 tabular-nums">
               {formatRupiah(totalSaved)}
             </div>
-            <div className="text-xs text-neutral-400 font-mono mt-0.5">
-              Dari sasaran target: {formatRupiah(totalTarget)} ({overallProgress}% Tercapai)
+            <div className="text-xs text-neutral-500 font-mono mt-0.5">
+              Sasaran target: {formatRupiah(totalTarget)} ({overallProgress}% Tercapai)
             </div>
           </div>
-          <div className="p-3 bg-neutral-800 rounded-xl border border-neutral-700 text-center sm:text-right">
-            <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" /> Konsistensi Finansial
+          <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200/60 text-left sm:text-right">
+            <span className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5" /> Disiplin Finansial
             </span>
-            <p className="text-[11px] text-neutral-400 mt-0.5">Menabung teratur melatih disiplin anggaran harian.</p>
+            <p className="text-[11px] text-neutral-500 mt-0.5">Menabung teratur melatih kestabilan anggaran bulanan.</p>
           </div>
         </div>
 
         {/* Aggregate Progress Bar */}
-        <div className="h-2 w-full bg-neutral-800 rounded-full overflow-hidden">
+        <div className="h-2 w-full bg-neutral-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+            className="h-full bg-emerald-600 rounded-full transition-all duration-500"
             style={{ width: `${Math.min(100, overallProgress)}%` }}
           />
         </div>

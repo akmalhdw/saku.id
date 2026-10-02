@@ -159,27 +159,27 @@ export const WalletsView: React.FC<WalletsViewProps> = ({
       </div>
 
       {/* Total Balance & Net Worth Overview */}
-      <div className="p-6 bg-neutral-900 text-white rounded-xl shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="p-5 sm:p-6 bg-white text-neutral-900 rounded-2xl border border-neutral-200/80 shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-5">
         <div>
-          <span className="text-xs font-medium text-neutral-400">Total Saldo Kas ({wallets.length} Akun)</span>
-          <div className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-white mt-1 tabular-nums">
+          <span className="text-xs font-medium text-neutral-500">Total Saldo Kas ({wallets.length} Akun)</span>
+          <div className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-neutral-950 mt-1 tabular-nums">
             {formatRupiah(totalBalance)}
           </div>
         </div>
 
         <div>
-          <span className="text-xs font-medium text-neutral-400">Total Hutang Aktif</span>
+          <span className="text-xs font-medium text-neutral-500">Total Hutang Aktif</span>
           <div className={`text-2xl sm:text-3xl font-bold font-mono tracking-tight mt-1 tabular-nums ${
-            totalDebt > 0 ? 'text-red-400' : 'text-neutral-300'
+            totalDebt > 0 ? 'text-red-600' : 'text-neutral-700'
           }`}>
             {formatRupiah(totalDebt)}
           </div>
         </div>
 
         <div>
-          <span className="text-xs font-medium text-neutral-400">Kekayaan Bersih (Saldo - Hutang)</span>
+          <span className="text-xs font-medium text-neutral-500">Kekayaan Bersih (Saldo - Hutang)</span>
           <div className={`text-2xl sm:text-3xl font-bold font-mono tracking-tight mt-1 tabular-nums ${
-            netWorth >= 0 ? 'text-emerald-400' : 'text-red-400'
+            netWorth >= 0 ? 'text-emerald-700' : 'text-red-600'
           }`}>
             {formatRupiah(netWorth)}
           </div>

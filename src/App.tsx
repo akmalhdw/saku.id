@@ -33,6 +33,7 @@ import { TransactionModal } from './components/TransactionModal';
 import { TransferModal } from './components/TransferModal';
 import { BudgetConfigModal } from './components/BudgetConfigModal';
 import { InstallPwaModal } from './components/InstallPwaModal';
+import { ResetDataModal } from './components/ResetDataModal';
 
 const STORAGE_KEY_PREFIX = 'kelolauang_app_state_v1';
 
@@ -99,6 +100,7 @@ export default function App() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState<boolean>(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState<boolean>(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
   const [prefilledCategoryFilter, setPrefilledCategoryFilter] = useState<string>('all');
 
@@ -327,8 +329,165 @@ export default function App() {
     setTransactions((prev) => [billTx, ...prev]);
   };
 
-  // Reset to default demo data
-  const handleResetData = () => {
+  // Debt & Receivable Management
+  const handleSaveDebt = (
+    debtData: Omit<DebtItem, 'id'>,
+    idToEdit?: string,
+    syncWallet?: { enabled: boolean; walletId: string }
+  ) => {
+    if (idToEdit) {
+      setDebts((prev) =>
+        prev.map((d) => (d.id === idToEdit ? { ...debtData, id: idToEdit } : d))
+      );
+    } else {
+      const newId = `db-${Date.now()}`;
+      const newDebt: DebtItem = {
+        ...debtData,
+        id: newId,
+      };
+      setDebts((prev) => [newDebt, ...prev]);
+
+      // If user chose to sync with wallet on creation:
+      if (syncWallet?.enabled && syncWallet.walletId) {
+        if (debtData.type === 'debt') {
+          // You borrowed money from someone -> cash enters wallet
+          setWallets((prev) =>
+            prev.map((w) =>
+              w.id === syncWallet.walletId ? { ...w, balance: w.balance + debtData.amount } : w
+            )
+          );
+          const incomeTx: Transaction = {
+            id: `tx-db-in-${Date.now()}`,
+            type: 'income',
+            category: 'Lainnya',
+            amount: debtData.amount,
+            walletId: syncWallet.walletId,
+            date: getTodayString(),
+            time: getCurrentTimeString(),
+            note: `Penerimaan pinjaman dana dari ${debtData.personName}`,
+          };
+          setTransactions((prev) => [incomeTx, ...prev]);
+        } else {
+          // You lent money to someone -> cash leaves wallet
+          setWallets((prev) =>
+            prev.map((w) =>
+              w.id === syncWallet.walletId ? { ...w, balance: w.balance - debtData.amount } : w
+            )
+          );
+          const expenseTx: Transaction = {
+            id: `tx-db-out-${Date.now()}`,
+            type: 'expense',
+            category: 'Lainnya',
+            amount: debtData.amount,
+            walletId: syncWallet.walletId,
+            date: getTodayString(),
+            time: getCurrentTimeString(),
+            note: `Pinjaman uang ke ${debtData.personName}`,
+          };
+          setTransactions((prev) => [expenseTx, ...prev]);
+        }
+      }
+    }
+  };
+
+  const handleDeleteDebt = (id: string) => {
+    setDebts((prev) => prev.filter((d) => d.id !== id));
+  };
+
+  const handleProcessDebtPayment = (
+    debtId: string,
+    amountToPay: number,
+    walletId?: string
+  ) => {
+    const debt = debts.find((d) => d.id === debtId);
+    if (!debt) return;
+
+    const currentPaid = debt.paidAmount || 0;
+    const newPaid = currentPaid + amountToPay;
+    const isSettled = newPaid >= debt.amount;
+
+    setDebts((prev) =>
+      prev.map((d) =>
+        d.id === debtId
+          ? {
+              ...d,
+              paidAmount: newPaid,
+              status: isSettled ? 'settled' : 'active',
+            }
+          : d
+      )
+    );
+
+    // If wallet synchronization was selected:
+    if (walletId) {
+      if (debt.type === 'debt') {
+        // Paying debt -> money leaves wallet
+        setWallets((prev) =>
+          prev.map((w) =>
+            w.id === walletId ? { ...w, balance: w.balance - amountToPay } : w
+          )
+        );
+        const payTx: Transaction = {
+          id: `tx-pay-debt-${Date.now()}`,
+          type: 'expense',
+          category: 'Tagihan & Utilitas',
+          amount: amountToPay,
+          walletId,
+          date: getTodayString(),
+          time: getCurrentTimeString(),
+          note: isSettled
+            ? `Pelunasan hutang ke ${debt.personName}`
+            : `Cicilan hutang ke ${debt.personName}`,
+        };
+        setTransactions((prev) => [payTx, ...prev]);
+      } else {
+        // Receiving receivable -> money enters wallet
+        setWallets((prev) =>
+          prev.map((w) =>
+            w.id === walletId ? { ...w, balance: w.balance + amountToPay } : w
+          )
+        );
+        const receiveTx: Transaction = {
+          id: `tx-rec-piutang-${Date.now()}`,
+          type: 'income',
+          category: 'Lainnya',
+          amount: amountToPay,
+          walletId,
+          date: getTodayString(),
+          time: getCurrentTimeString(),
+          note: isSettled
+            ? `Pelunasan piutang dari ${debt.personName}`
+            : `Penerimaan cicilan piutang dari ${debt.personName}`,
+        };
+        setTransactions((prev) => [receiveTx, ...prev]);
+      }
+    }
+  };
+
+  // Clean Zero Database Reset (No fake data, all balances start at 0)
+  const handleResetToCleanZero = () => {
+    localStorage.clear();
+    const cleanWallets: Wallet[] = [
+      { id: 'w-1', name: 'Dompet Tunai', type: 'cash', balance: 0, color: '#059669', iconName: 'Banknote' },
+      { id: 'w-2', name: 'Rekening Bank', type: 'bank', balance: 0, color: '#2563eb', iconName: 'Building2' },
+      { id: 'w-3', name: 'E-Wallet', type: 'ewallet', balance: 0, color: '#0284c7', iconName: 'Smartphone' },
+    ];
+    setWallets(cleanWallets);
+    setTransactions([]);
+    setDebts([]);
+    setBills([]);
+    setSavingsGoals([]);
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}_wallets`, JSON.stringify(cleanWallets));
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}_transactions`, JSON.stringify([]));
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}_debts`, JSON.stringify([]));
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}_bills`, JSON.stringify([]));
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}_savingsGoals`, JSON.stringify([]));
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}_clean_initialized`, 'true');
+    setActiveTab('dashboard');
+  };
+
+  // Restore realistic demo dataset
+  const handleResetToDemoData = () => {
     localStorage.clear();
     setWallets(INITIAL_WALLETS);
     setTransactions(getInitialTransactions());
@@ -357,7 +516,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 flex flex-col">
+    <div className="min-h-screen bg-[#faf9f6] text-neutral-900 flex flex-col font-sans selection:bg-neutral-200">
       {/* 3-Zone Top Navigation Contract */}
       <Navbar
         activeTab={activeTab}
@@ -456,7 +615,9 @@ export default function App() {
             debts={debts}
             wallets={wallets}
             onUpdateBills={setBills}
-            onUpdateDebts={setDebts}
+            onSaveDebt={handleSaveDebt}
+            onDeleteDebt={handleDeleteDebt}
+            onProcessDebtPayment={handleProcessDebtPayment}
             onPayBillWithWallet={handlePayBillWithWallet}
           />
         )}
@@ -468,7 +629,7 @@ export default function App() {
             wallets={wallets}
             budgetConfig={budgetConfig}
             savingsGoals={savingsGoals}
-            onResetData={handleResetData}
+            onOpenResetModal={() => setIsResetModalOpen(true)}
             onRestoreData={handleRestoreData}
           />
         )}
@@ -505,6 +666,13 @@ export default function App() {
       <InstallPwaModal
         isOpen={isInstallModalOpen}
         onClose={() => setIsInstallModalOpen(false)}
+      />
+
+      <ResetDataModal
+        isOpen={isResetModalOpen}
+        onClose={() => setIsResetModalOpen(false)}
+        onResetToCleanZero={handleResetToCleanZero}
+        onResetToDemoData={handleResetToDemoData}
       />
 
       {/* Clean Footer */}
